@@ -1,9 +1,11 @@
-# Pooh Deploy - Gerador de Esquema EasyPanel
-FROM nginx:alpine
+FROM node:18-alpine
 
-RUN rm -rf /usr/share/nginx/html/*
-COPY gerador-easypanel.html /usr/share/nginx/html/index.html
+WORKDIR /app
+
+COPY server.js .
+COPY gerador-easypanel.html .
+COPY env-tokens-exemplo.txt .
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "server.js"]
