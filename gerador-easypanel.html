@@ -411,14 +411,9 @@
         <div class="section-title">Informações do Cliente</div>
         <div class="field-grid">
           <div class="field">
-            <label>Nome do Projeto (EasyPanel) <span class="required">*</span></label>
-            <input type="text" id="projectName" placeholder="Ex: cuiaba" required oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
-            <span class="hint">Slug minúsculo, sem espaços. Usado como projectName e serviceName.</span>
-          </div>
-          <div class="field">
             <label>Nome do Cliente <span class="required">*</span></label>
             <input type="text" id="clientName" placeholder="Ex: Cuiabá" required>
-            <span class="hint">REACT_APP_NAME, PLATFORM_NAME, COMPANY_NAME</span>
+            <span class="hint">REACT_APP_NAME, PLATFORM_NAME, COMPANY_NAME. Também gera o slug do projeto (ex: cuiaba_front, cuiaba_back).</span>
           </div>
           <div class="field">
             <label>Nome Curto <span class="required">*</span></label>
@@ -687,9 +682,9 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__
       const supabaseUrl = val('supabaseUrl');
       const supabaseAnonKey = val('supabaseAnonKey');
       const supabaseServiceRoleKey = val('supabaseServiceRoleKey');
-      const projectSlug = val('projectName');
+      const projectSlug = clientName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 
-      if (!projectSlug || !clientName || !frontendDomain || !backendDomain || !supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
+      if (!clientName || !frontendDomain || !backendDomain || !supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
         showToast('Preencha todos os campos obrigatórios!'); return;
       }
 
@@ -886,7 +881,7 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
       document.getElementById('schemaJsonSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       localStorage.setItem('easypanel_last', JSON.stringify({
-        projectName: projectSlug, clientName, shortName, apiKey, frontendDomain, backendDomain,
+        clientName, shortName, apiKey, frontendDomain, backendDomain,
         supabaseUrl, supabaseAnonKey, supabaseServiceRoleKey
       }));
       showToast('Esquema gerado com sucesso!');
@@ -912,10 +907,11 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
       try {
         const saved = JSON.parse(localStorage.getItem('easypanel_last'));
         if (!saved) return;
-        ['projectName','clientName','shortName','apiKey','frontendDomain','backendDomain','supabaseUrl','supabaseAnonKey','supabaseServiceRoleKey'].forEach(f => {
+        ['clientName','shortName','apiKey','frontendDomain','backendDomain','supabaseUrl','supabaseAnonKey','supabaseServiceRoleKey'].forEach(f => {
           if (saved[f]) document.getElementById(f).value = saved[f];
         });
         if (saved.backendDomain) document.getElementById('backendDomain').dataset.manualEdit = 'true';
+        if (saved.projectName && !saved.clientName) document.getElementById('clientName').value = saved.projectName;
         updatePreview();
       } catch(e) {}
     })();
