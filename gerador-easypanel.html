@@ -840,10 +840,13 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
         }
         return out;
       }
+      function stripPlaceholders(envStr) {
+        return envStr.replace(/=__PREENCHER__$/gm, '=');
+      }
 
       const overrides = (typeof window.POOH_ENV_TOKENS === 'object' && window.POOH_ENV_TOKENS !== null) ? window.POOH_ENV_TOKENS : {};
-      const frontendEnvFinal = applyOverrides(frontendEnv, overrides);
-      const backendEnvFinal = applyOverrides(backendEnv, overrides);
+      const frontendEnvFinal = stripPlaceholders(applyOverrides(frontendEnv, overrides));
+      const backendEnvFinal = stripPlaceholders(applyOverrides(backendEnv, overrides));
 
       document.getElementById('frontendEnv').textContent = frontendEnvFinal;
       document.getElementById('backendEnv').textContent = backendEnvFinal;
