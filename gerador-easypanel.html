@@ -355,6 +355,7 @@
   </style>
 </head>
 <body>
+  <script>window.POOH_ENV_TOKENS = (function(){ try { return __POOH_ENV_JSON__; } catch(e) { return {}; } })();</script>
   <div class="toast-container" id="toastContainer"></div>
 
   <div class="header">
@@ -481,19 +482,8 @@
         </div>
       </div>
 
-      <div class="section">
-        <div class="section-title">Tokens e chaves (opcional)</div>
-        <div class="field full-width">
-          <label>Variáveis de ambiente</label>
-          <textarea id="envOverrides" rows="8" placeholder="Cole aqui as variáveis no formato KEY=valor (uma por linha).&#10;Ex.: TWILIO_ACCOUNT_SID=ACxxx&#10;N8N_API_KEY=eyJ..." style="resize:vertical; font-family: 'SF Mono', monospace; font-size: 12px;"></textarea>
-          <span class="hint">Use o modelo abaixo. As chaves aqui preenchidas substituirão os placeholders no esquema gerado. Deixe em branco para gerar com __PREENCHER__.</span>
-          <div style="margin-top: 10px;">
-            <button type="button" class="btn-action btn-copy" onclick="var d=document.getElementById('envExampleContent'); d.textContent=getEnvExampleContent(); downloadFile('envExampleContent', 'env-tokens-exemplo.txt')">Baixar modelo de variáveis</button>
-          </div>
-        </div>
-      </div>
+      <p style="font-size: 12px; color: var(--text-light); margin-bottom: 16px;">Os tokens e chaves vêm das variáveis de ambiente do EasyPanel. Configure-as no painel do serviço. <a href="/env-tokens-exemplo.txt" download style="color: var(--primary);">Lista de variáveis</a> <span style="color: var(--text-muted);">|</span> <button type="button" class="btn-action" style="padding: 4px 10px; font-size: 12px;" onclick="var d=document.getElementById('envExampleContent'); d.textContent=getEnvExampleContent(); downloadFile('envExampleContent', 'env-tokens-exemplo.txt');">Baixar modelo</button></p>
       <div id="envExampleContent" style="display:none;"></div>
-
       <button type="button" class="btn-generate" onclick="generate()">Gerar Esquema Completo</button>
     </form>
 
@@ -857,7 +847,7 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
         return out;
       }
 
-      const overrides = parseEnvOverrides(val('envOverrides'));
+      const overrides = (typeof window.POOH_ENV_TOKENS === 'object' && window.POOH_ENV_TOKENS !== null) ? window.POOH_ENV_TOKENS : {};
       const frontendEnvFinal = applyOverrides(frontendEnv, overrides);
       const backendEnvFinal = applyOverrides(backendEnv, overrides);
 
