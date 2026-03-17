@@ -864,6 +864,7 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
               source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_front', ref: 'master', path: '/', autoDeploy: false },
               build: { type: 'dockerfile', file: 'Dockerfile' },
               env: envToOneLine(frontendEnvFinal),
+              createEnvFile: true,
               deploy: { replicas: 1, command: null, zeroDowntime: true },
               domains: [{ host: frontendDomain, https: true, port: 3000, path: '/', wildcard: false, internalProtocol: 'http' }]
             }
@@ -876,6 +877,7 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
               source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_back', ref: 'main', path: '/', autoDeploy: false },
               build: { type: 'dockerfile', file: 'Dockerfile' },
               env: envToOneLine(backendEnvFinal),
+              createEnvFile: true,
               deploy: { replicas: 1, command: null, zeroDowntime: true },
               domains: [{ host: backendDomain, https: true, port: 3001, path: '/', wildcard: false, internalProtocol: 'http' }]
             }
