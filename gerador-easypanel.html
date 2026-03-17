@@ -411,9 +411,14 @@
         <div class="section-title">Informações do Cliente</div>
         <div class="field-grid">
           <div class="field">
+            <label>Nome do Projeto (EasyPanel) <span class="required">*</span></label>
+            <input type="text" id="projectName" placeholder="Ex: cuiaba" required oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
+            <span class="hint">Slug minúsculo, sem espaços. Usado como projectName no EasyPanel.</span>
+          </div>
+          <div class="field">
             <label>Nome do Cliente <span class="required">*</span></label>
             <input type="text" id="clientName" placeholder="Ex: Cuiabá" required>
-            <span class="hint">REACT_APP_NAME, PLATFORM_NAME, COMPANY_NAME. Também gera o slug do projeto (ex: cuiaba_front, cuiaba_back).</span>
+            <span class="hint">REACT_APP_NAME, PLATFORM_NAME, COMPANY_NAME. Gera o serviceName (ex: cuiaba_front, cuiaba_back).</span>
           </div>
           <div class="field">
             <label>Nome Curto <span class="required">*</span></label>
@@ -674,6 +679,7 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__
     }
 
     function generate() {
+      const projectName = val('projectName');
       const clientName = val('clientName');
       const shortName = val('shortName') || clientName;
       const apiKey = val('apiKey');
@@ -682,9 +688,9 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__
       const supabaseUrl = val('supabaseUrl');
       const supabaseAnonKey = val('supabaseAnonKey');
       const supabaseServiceRoleKey = val('supabaseServiceRoleKey');
-      const projectSlug = clientName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+      const clientSlug = clientName.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 
-      if (!clientName || !frontendDomain || !backendDomain || !supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
+      if (!projectName || !clientName || !frontendDomain || !backendDomain || !supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
         showToast('Preencha todos os campos obrigatórios!'); return;
       }
 
@@ -853,8 +859,8 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
           {
             type: 'app',
             data: {
-              projectName: projectSlug,
-              serviceName: projectSlug + '_front',
+              projectName: projectName,
+              serviceName: clientSlug + '_front',
               source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_front', ref: 'master', path: '/', autoDeploy: false },
               build: { type: 'dockerfile', file: 'Dockerfile' },
               env: envToOneLine(frontendEnvFinal),
@@ -865,8 +871,8 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
           {
             type: 'app',
             data: {
-              projectName: projectSlug,
-              serviceName: projectSlug + '_back',
+              projectName: projectName,
+              serviceName: clientSlug + '_back',
               source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_back', ref: 'main', path: '/', autoDeploy: false },
               build: { type: 'dockerfile', file: 'Dockerfile' },
               env: envToOneLine(backendEnvFinal),
@@ -881,7 +887,7 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
       document.getElementById('schemaJsonSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       localStorage.setItem('easypanel_last', JSON.stringify({
-        clientName, shortName, apiKey, frontendDomain, backendDomain,
+        projectName, clientName, shortName, apiKey, frontendDomain, backendDomain,
         supabaseUrl, supabaseAnonKey, supabaseServiceRoleKey
       }));
       showToast('Esquema gerado com sucesso!');
@@ -907,11 +913,10 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
       try {
         const saved = JSON.parse(localStorage.getItem('easypanel_last'));
         if (!saved) return;
-        ['clientName','shortName','apiKey','frontendDomain','backendDomain','supabaseUrl','supabaseAnonKey','supabaseServiceRoleKey'].forEach(f => {
+        ['projectName','clientName','shortName','apiKey','frontendDomain','backendDomain','supabaseUrl','supabaseAnonKey','supabaseServiceRoleKey'].forEach(f => {
           if (saved[f]) document.getElementById(f).value = saved[f];
         });
         if (saved.backendDomain) document.getElementById('backendDomain').dataset.manualEdit = 'true';
-        if (saved.projectName && !saved.clientName) document.getElementById('clientName').value = saved.projectName;
         updatePreview();
       } catch(e) {}
     })();
