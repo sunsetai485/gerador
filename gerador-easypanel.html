@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pooh - Gerador de Esquema EasyPanel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-2: #f0f2f5;
+      --border: #e4e8ee;
+      --border-hover: #c8cfd8;
+      --text: #2d3748;
+      --text-muted: #718096;
+      --text-light: #a0aec0;
+      --primary: #1db9a8;
+      --primary-light: #e6f7f5;
+      --primary-dark: #179e8f;
+      --primary-glow: rgba(29, 185, 168, 0.15);
+      --accent-orange: #f6a623;
+      --accent-orange-bg: #fef8eb;
+      --red: #e53e3e;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+      --shadow-lg: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Toast */
+    .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      background: var(--surface);
+      border-left: 4px solid var(--primary);
+      color: var(--text);
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2s forwards;
+      box-shadow: var(--shadow-lg);
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+    /* Header */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+    .header-logo svg { width: 48px; height: 48px; }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .header p {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Container */
+    .container { max-width: 920px; margin: 0 auto; padding: 28px 24px 80px; }
+
+    /* Section Card */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 16px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    /* Fields */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field-grid .full-width { grid-column: 1 / -1; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .field label .required { color: var(--red); margin-left: 2px; }
+    .field input, .field textarea {
+      background: var(--surface-2);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .field input:focus, .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+      background: var(--surface);
+    }
+    .field input::placeholder, .field textarea::placeholder { color: var(--text-light); }
+    .field .hint { font-size: 11.5px; color: var(--text-light); }
+
+    /* Derived preview */
+    .derived-preview {
+      background: var(--primary-light);
+      border: 1px solid rgba(29, 185, 168, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-top: 16px;
+    }
+    .derived-preview .title {
+      color: var(--primary-dark);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .derived-item { display: flex; justify-content: space-between; padding: 3px 0; gap: 12px; }
+    .derived-item .key {
+      color: var(--text-muted);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .derived-item .value {
+      color: var(--primary-dark);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      text-align: right;
+      word-break: break-all;
+    }
+
+    /* Generate button */
+    .btn-generate {
+      width: 100%;
+      padding: 15px;
+      background: var(--primary);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+    .btn-generate:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
+    .btn-generate:active { transform: translateY(0); }
+
+    /* Output sections */
+    .output-section { display: none; margin-bottom: 20px; }
+    .output-section.visible { display: block; }
+    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .output-label { font-size: 15px; font-weight: 600; color: var(--text); }
+    .output-actions { display: flex; gap: 8px; }
+
+    .btn-action {
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      transition: all 0.2s;
+      background: var(--surface);
+      color: var(--text-muted);
+    }
+    .btn-copy {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-color: rgba(29, 185, 168, 0.3);
+    }
+    .btn-copy:hover { background: rgba(29, 185, 168, 0.15); }
+    .btn-download {
+      background: var(--accent-orange-bg);
+      color: #c47f17;
+      border-color: rgba(246, 166, 35, 0.3);
+    }
+    .btn-download:hover { background: rgba(246, 166, 35, 0.12); }
+
+    /* Output box */
+    .output-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .output-box pre {
+      padding: 20px;
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: pre;
+      max-height: 500px;
+      overflow-y: auto;
+      background: #fafbfc;
+    }
+    .output-box pre::-webkit-scrollbar { width: 6px; height: 6px; }
+    .output-box pre::-webkit-scrollbar-track { background: transparent; }
+    .output-box pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* Info cards */
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .info-card .info-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .info-grid { display: grid; grid-template-columns: 130px 1fr; gap: 5px 14px; font-size: 13px; }
+    .info-grid .label { color: var(--text-muted); }
+    .info-grid .val {
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+    }
+
+    /* Details / mapping */
+    details { margin-bottom: 20px; }
+    details summary {
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 0;
+      transition: color 0.2s;
+    }
+    details summary:hover { color: var(--primary); }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 7px;
+      transition: all 0.2s;
+      border: none;
+      background: transparent;
+    }
+    .tab.active { background: var(--primary); color: white; }
+    .tab:hover:not(.active) { background: var(--surface); color: var(--text); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .mapping-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .mapping-table th {
+      text-align: left;
+      padding: 10px 12px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .mapping-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+    .mapping-table .var-name {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: var(--primary-dark);
+    }
+    .mapping-table .field-name { color: var(--text); font-weight: 500; }
+    .mapping-table .derivation { color: var(--text-light); font-size: 12px; }
+
+    /* Instruction block */
+    .instructions {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+    .instructions ol { margin: 6px 0 0 18px; }
+    .instructions code {
+      background: var(--surface-2);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--primary-dark);
+    }
+    .badge-orange { color: #c47f17; font-weight: 600; }
+    .badge-green { color: var(--primary-dark); font-weight: 600; }
+
+    @media (max-width: 640px) {
+      .field-grid { grid-template-columns: 1fr; }
+      .header h1 { font-size: 22px; }
+      .container { padding: 20px 16px 60px; }
+      .section { padding: 20px; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="header">
+    <div class="header-logo">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 44C24 44 4 32 4 18C4 12 8 6 14 6C18.5 6 22 9 24 12C26 9 29.5 6 34 6C40 6 44 12 44 18C44 32 24 44 24 44Z" fill="#1db9a8" opacity="0.15"/>
+        <path d="M24 42C24 42 6 31 6 18C6 13 9.5 8 14.5 8C18.5 8 21.5 10.5 24 13.5C26.5 10.5 29.5 8 33.5 8C38.5 8 42 13 42 18C42 31 24 42 24 42Z" stroke="#1db9a8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M16 22C16 22 20 28 24 28C28 28 32 22 32 22" stroke="#1db9a8" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <circle cx="18" cy="18" r="1.5" fill="#1db9a8"/>
+        <circle cx="30" cy="18" r="1.5" fill="#1db9a8"/>
+      </svg>
+      <h1>Pooh Deploy</h1>
+    </div>
+    <p>Gerador de esquema EasyPanel para novos clientes</p>
+  </div>
+
+  <div class="container">
+    <details>
+      <summary>Ver mapeamento de campos &rarr; variáveis</summary>
+      <div class="tabs" style="margin-top: 12px;">
+        <button class="tab active" onclick="switchMappingTab('frontend', this)">Frontend</button>
+        <button class="tab" onclick="switchMappingTab('backend', this)">Backend</button>
+      </div>
+      <div id="mapping-frontend" class="tab-content active">
+        <div class="output-box">
+          <table class="mapping-table">
+            <thead><tr><th>Campo</th><th>Variável</th><th>Derivação</th></tr></thead>
+            <tbody>
+              <tr><td class="field-name">Nome do Cliente</td><td class="var-name">REACT_APP_NAME</td><td class="derivation">Sistema - {nome}</td></tr>
+              <tr><td class="field-name">Nome Curto</td><td class="var-name">REACT_APP_SHORT_NAME</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Nome do Cliente</td><td class="var-name">REACT_APP_PLATFORM_NAME / COMPANY_NAME</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Supabase URL</td><td class="var-name">SUPABASE_URL / REACT_APP_SUPABASE_URL</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Supabase Anon Key</td><td class="var-name">SUPABASE_ANON_KEY / REACT_APP_SUPABASE_ANON_KEY</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Supabase Service Role</td><td class="var-name">SUPABASE_SERVICE_ROLE_KEY</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Domínio Frontend</td><td class="var-name">FRONTEND_URL / ALLOWED_ORIGINS / REACT_APP_FRONTEND_URL</td><td class="derivation">https://{dom}</td></tr>
+              <tr><td class="field-name">Domínio Backend</td><td class="var-name">BASE_URL / API_URL / WEBSOCKET_URL / BACKEND_URL</td><td class="derivation">https:// / wss:// / /api/v1</td></tr>
+              <tr><td class="field-name">API Key</td><td class="var-name">REACT_APP_API_KEY</td><td class="derivation">Direto</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="mapping-backend" class="tab-content">
+        <div class="output-box">
+          <table class="mapping-table">
+            <thead><tr><th>Campo</th><th>Variável</th><th>Derivação</th></tr></thead>
+            <tbody>
+              <tr><td class="field-name">Supabase URL</td><td class="var-name">SUPABASE_URL</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Supabase Anon Key</td><td class="var-name">SUPABASE_ANON_KEY</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Supabase Service Role</td><td class="var-name">SUPABASE_SERVICE_ROLE_KEY</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Domínio Frontend</td><td class="var-name">FRONTEND_URL / ALLOWED_ORIGINS</td><td class="derivation">https://{dom}</td></tr>
+              <tr><td class="field-name">Domínio Backend</td><td class="var-name">BACKEND_URL / BASE_URL / TELEGRAM_WEBHOOK_URL</td><td class="derivation">https:// / /api/v1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+
+    <form id="generatorForm" onsubmit="return false;">
+      <div class="section">
+        <div class="section-title">Informações do Cliente</div>
+        <div class="field-grid">
+          <div class="field">
+            <label>Nome do Projeto (EasyPanel) <span class="required">*</span></label>
+            <input type="text" id="projectName" placeholder="Ex: cuiaba" required oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
+            <span class="hint">Slug minúsculo, sem espaços. Usado como projectName e serviceName.</span>
+          </div>
+          <div class="field">
+            <label>Nome do Cliente <span class="required">*</span></label>
+            <input type="text" id="clientName" placeholder="Ex: Cuiabá" required>
+            <span class="hint">REACT_APP_NAME, PLATFORM_NAME, COMPANY_NAME</span>
+          </div>
+          <div class="field">
+            <label>Nome Curto <span class="required">*</span></label>
+            <input type="text" id="shortName" placeholder="Ex: Cuiabá">
+            <span class="hint">REACT_APP_SHORT_NAME</span>
+          </div>
+          <div class="field">
+            <label>API Key do Cliente <span class="required">*</span></label>
+            <input type="text" id="apiKey" placeholder="Ex: cuiaba001@">
+            <span class="hint">REACT_APP_API_KEY</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Domínios</div>
+        <div class="field-grid">
+          <div class="field">
+            <label>Domínio Frontend <span class="required">*</span></label>
+            <input type="text" id="frontendDomain" placeholder="Ex: cuiaba.pooh.pro" required oninput="autoDeriveDomains()">
+            <span class="hint">Sem https:// — apenas o domínio</span>
+          </div>
+          <div class="field">
+            <label>Domínio Backend <span class="required">*</span></label>
+            <input type="text" id="backendDomain" placeholder="Ex: api.cuiaba.pooh.pro" required>
+            <span class="hint">Auto: api.{frontend}</span>
+          </div>
+        </div>
+        <div class="derived-preview" id="domainPreview" style="display:none;">
+          <div class="title">URLs derivadas</div>
+          <div class="derived-item"><span class="key">FRONTEND_URL</span><span class="value" id="prevFrontUrl">—</span></div>
+          <div class="derived-item"><span class="key">REACT_APP_API_URL</span><span class="value" id="prevApiUrl">—</span></div>
+          <div class="derived-item"><span class="key">REACT_APP_WEBSOCKET_URL</span><span class="value" id="prevWsUrl">—</span></div>
+          <div class="derived-item"><span class="key">BACKEND_URL</span><span class="value" id="prevBackUrl">—</span></div>
+          <div class="derived-item"><span class="key">TELEGRAM_WEBHOOK_URL</span><span class="value" id="prevTgUrl">—</span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Supabase</div>
+        <div class="field-grid">
+          <div class="field full-width">
+            <label>Supabase URL <span class="required">*</span></label>
+            <input type="text" id="supabaseUrl" placeholder="https://xxxxx.supabase.co" required>
+          </div>
+          <div class="field full-width">
+            <label>Supabase Anon Key <span class="required">*</span></label>
+            <textarea id="supabaseAnonKey" rows="2" placeholder="eyJhbGciOi..." required style="resize:vertical;"></textarea>
+          </div>
+          <div class="field full-width">
+            <label>Supabase Service Role Key <span class="required">*</span></label>
+            <textarea id="supabaseServiceRoleKey" rows="2" placeholder="eyJhbGciOi..." required style="resize:vertical;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Tokens e chaves (opcional)</div>
+        <div class="field full-width">
+          <label>Variáveis de ambiente</label>
+          <textarea id="envOverrides" rows="8" placeholder="Cole aqui as variáveis no formato KEY=valor (uma por linha).&#10;Ex.: TWILIO_ACCOUNT_SID=ACxxx&#10;N8N_API_KEY=eyJ..." style="resize:vertical; font-family: 'SF Mono', monospace; font-size: 12px;"></textarea>
+          <span class="hint">Use o modelo abaixo. As chaves aqui preenchidas substituirão os placeholders no esquema gerado. Deixe em branco para gerar com __PREENCHER__.</span>
+          <div style="margin-top: 10px;">
+            <button type="button" class="btn-action btn-copy" onclick="var d=document.getElementById('envExampleContent'); d.textContent=getEnvExampleContent(); downloadFile('envExampleContent', 'env-tokens-exemplo.txt')">Baixar modelo de variáveis</button>
+          </div>
+        </div>
+      </div>
+      <div id="envExampleContent" style="display:none;"></div>
+
+      <button type="button" class="btn-generate" onclick="generate()">Gerar Esquema Completo</button>
+    </form>
+
+    <div id="outputArea">
+      <!-- Schema JSON -->
+      <div class="output-section" id="schemaJsonSection">
+        <div class="output-header">
+          <span class="output-label">Esquema JSON — Create from Schema</span>
+          <div class="output-actions">
+            <button class="btn-action btn-copy" onclick="copyToClipboard('schemaJson')">Copiar JSON</button>
+            <button class="btn-action btn-download" onclick="downloadFile('schemaJson', 'easypanel-schema.json')">Baixar .json</button>
+          </div>
+        </div>
+        <div class="instructions">
+          Projeto &rarr; Templates &rarr; Developer &rarr; <strong>Create from Schema</strong> &rarr; Cole e confirme.<br><br>
+          <span class="badge-orange">Se der erro com GitHub</span>, clique abaixo para trocar para image (placeholder):
+          <div style="margin-top: 8px;">
+            <button class="btn-action" onclick="switchToImageSource()">Gerar com source Image (fallback)</button>
+          </div>
+          <br>
+          <span class="badge-green">Após criar:</span>
+          <ol>
+            <li>Se usou image: troque source para GitHub &rarr; <code>sunsetai485/sunset_front</code> branch <code>master</code> / <code>sunsetai485/sunset_back</code> branch <code>main</code></li>
+            <li>Clique em <strong>Deploy</strong> em cada serviço</li>
+            <li>Bolinha fica verde quando o build completar</li>
+          </ol>
+        </div>
+        <div class="output-box">
+          <pre id="schemaJson"></pre>
+        </div>
+      </div>
+
+      <!-- Config cards -->
+      <div class="output-section" id="configSection">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+          <div class="info-card">
+            <div class="info-title">Frontend</div>
+            <div class="info-grid">
+              <span class="label">Owner</span><span class="val">sunsetai485</span>
+              <span class="label">Repo</span><span class="val">sunset_front</span>
+              <span class="label">Branch</span><span class="val">master</span>
+              <span class="label">Build</span><span class="val">Dockerfile</span>
+              <span class="label">Porta</span><span class="val">3000</span>
+              <span class="label">Domínio</span><span class="val" id="infoFrontDomain">—</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-title">Backend</div>
+            <div class="info-grid">
+              <span class="label">Owner</span><span class="val">sunsetai485</span>
+              <span class="label">Repo</span><span class="val">sunset_back</span>
+              <span class="label">Branch</span><span class="val">main</span>
+              <span class="label">Build</span><span class="val">Dockerfile</span>
+              <span class="label">Porta</span><span class="val">3001</span>
+              <span class="label">Domínio</span><span class="val" id="infoBackDomain">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Frontend ENV -->
+      <div class="output-section" id="frontendOutput">
+        <div class="output-header">
+          <span class="output-label">Variáveis — Frontend</span>
+          <div class="output-actions">
+            <button class="btn-action btn-copy" onclick="copyToClipboard('frontendEnv')">Copiar</button>
+            <button class="btn-action btn-download" onclick="downloadFile('frontendEnv', 'frontend.env')">Baixar .env</button>
+          </div>
+        </div>
+        <div class="output-box"><pre id="frontendEnv"></pre></div>
+      </div>
+
+      <!-- Backend ENV -->
+      <div class="output-section" id="backendOutput">
+        <div class="output-header">
+          <span class="output-label">Variáveis — Backend</span>
+          <div class="output-actions">
+            <button class="btn-action btn-copy" onclick="copyToClipboard('backendEnv')">Copiar</button>
+            <button class="btn-action btn-download" onclick="downloadFile('backendEnv', 'backend.env')">Baixar .env</button>
+          </div>
+        </div>
+        <div class="output-box"><pre id="backendEnv"></pre></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function autoDeriveDomains() {
+      const fd = document.getElementById('frontendDomain').value.trim();
+      const bd = document.getElementById('backendDomain');
+      if (fd && !bd.dataset.manualEdit) bd.value = 'api.' + fd;
+      updatePreview();
+    }
+    document.getElementById('backendDomain').addEventListener('input', function () { this.dataset.manualEdit = 'true'; updatePreview(); });
+    document.getElementById('frontendDomain').addEventListener('input', function () { document.getElementById('backendDomain').dataset.manualEdit = ''; });
+
+    function updatePreview() {
+      const fd = document.getElementById('frontendDomain').value.trim();
+      const bd = document.getElementById('backendDomain').value.trim();
+      const preview = document.getElementById('domainPreview');
+      if (fd || bd) {
+        preview.style.display = 'block';
+        document.getElementById('prevFrontUrl').textContent = fd ? 'https://' + fd : '—';
+        document.getElementById('prevApiUrl').textContent = bd ? 'https://' + bd + '/api/v1' : '—';
+        document.getElementById('prevWsUrl').textContent = bd ? 'wss://' + bd : '—';
+        document.getElementById('prevBackUrl').textContent = bd ? 'https://' + bd : '—';
+        document.getElementById('prevTgUrl').textContent = bd ? 'https://' + bd + '/api/v1/webhooks/telegram' : '—';
+      } else { preview.style.display = 'none'; }
+    }
+
+    function showToast(msg) {
+      const c = document.getElementById('toastContainer'), t = document.createElement('div');
+      t.className = 'toast'; t.textContent = msg; c.appendChild(t);
+      setTimeout(() => t.remove(), 2500);
+    }
+
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).textContent;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => showToast('Copiado!')).catch(() => fallbackCopy(text));
+      } else { fallbackCopy(text); }
+    }
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); showToast('Copiado!'); } catch(e) { showToast('Selecione manualmente.'); }
+      document.body.removeChild(ta);
+    }
+
+    function downloadFile(id, filename) {
+      const text = document.getElementById(id).textContent;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+      a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+    }
+
+    function switchMappingTab(tab, btn) {
+      document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('mapping-' + tab).classList.add('active');
+    }
+
+    function val(id) { return (document.getElementById(id).value || '').trim(); }
+
+    function getEnvExampleContent() {
+      return `# Cole as linhas abaixo no campo "Variáveis de ambiente" acima (ou preencha e use neste arquivo)
+# Formato: KEY=valor (uma por linha). Remova o # das linhas que preencher.
+
+# === FRONTEND / BACKEND (comum) ===
+JWT_SECRET=__PREENCHER__
+TWILIO_ACCOUNT_SID=__PREENCHER__
+TWILIO_AUTH_TOKEN=__PREENCHER__
+TWILIO_PHONE_NUMBER=__PREENCHER__
+EVOLUTION_API_BASE_URL=__PREENCHER__
+EVOLUTION_API_INSTANCE=__PREENCHER__
+EVOLUTION_API_TOKEN=__PREENCHER__
+WHATSAPP_WEBHOOK_TOKEN=__PREENCHER__
+TELEGRAM_BOT_TOKEN=__PREENCHER__
+TELEGRAM_WEBHOOK_URL=__PREENCHER__
+SMTP_HOST=__PREENCHER__
+SMTP_PORT=__PREENCHER__
+SMTP_USER=__PREENCHER__
+SMTP_PASS=__PREENCHER__
+FROM_EMAIL=__PREENCHER__
+FROM_NAME=__PREENCHER__
+N8N_BASE_URL=__PREENCHER__
+VAPID_PUBLIC_KEY=__PREENCHER__
+VAPID_PRIVATE_KEY=__PREENCHER__
+
+# === BACKEND ===
+N8N_API_KEY=__PREENCHER__
+N8N_DEFAULT_WORKFLOW_ID=__PREENCHER__
+MOBIZON_API_KEY=__PREENCHER__
+MOBIZON_API_DOMAIN=__PREENCHER__
+N8N_BASE_URL=__PREENCHER__
+VAPI_API_KEY=__PREENCHER__
+VAPI_ASSISTANT_ID=__PREENCHER__
+VAPI_PHONE_NUMBER_ID=__PREENCHER__
+AUTHENTICATION_API_KEY=__PREENCHER__
+EVOLUTION_API_URL=__PREENCHER__
+EVOLUTION_API_TOKEN=__PREENCHER__
+EVOLUTION_API_BASE_URL=__PREENCHER__
+N8N_WEBHOOK_URL_YOUSHOP=__PREENCHER__
+N8N_RECOVERY_WEBHOOK_URL=__PREENCHER__
+CLOUDFLARE_R2_ACCOUNT_ID=__PREENCHER__
+CLOUDFLARE_R2_ACCESS_KEY_ID=__PREENCHER__
+CLOUDFLARE_R2_SECRET_ACCESS_KEY=__PREENCHER__
+CLOUDFLARE_R2_BUCKET_NAME=__PREENCHER__
+CLOUDFLARE_R2_PUBLIC_URL=__PREENCHER__
+N8N_PRESCRIPTION_WEBHOOK_URL=__PREENCHER__
+N8N_CERTIFICATE_WEBHOOK_URL=__PREENCHER__
+N8N_RECEIPT_WEBHOOK_URL=__PREENCHER__
+N8N_REFERRAL_WEBHOOK_URL=__PREENCHER__
+N8N_BUDGET_WEBHOOK_URL=__PREENCHER__
+FOCUSNFE_TOKEN=__PREENCHER__
+FOCUSNFE_ENVIRONMENT=__PREENCHER__
+`;
+    }
+
+    function generate() {
+      const clientName = val('clientName');
+      const shortName = val('shortName') || clientName;
+      const apiKey = val('apiKey');
+      const frontendDomain = val('frontendDomain');
+      const backendDomain = val('backendDomain');
+      const supabaseUrl = val('supabaseUrl');
+      const supabaseAnonKey = val('supabaseAnonKey');
+      const supabaseServiceRoleKey = val('supabaseServiceRoleKey');
+      const projectSlug = val('projectName');
+
+      if (!projectSlug || !clientName || !frontendDomain || !backendDomain || !supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
+        showToast('Preencha todos os campos obrigatórios!'); return;
+      }
+
+      const fUrl = 'https://' + frontendDomain;
+      const bUrl = 'https://' + backendDomain;
+
+      const frontendEnv = `REACT_APP_NAME=Sistema - ${clientName}
+REACT_APP_SHORT_NAME=${shortName}
+REACT_APP_PLATFORM_NAME=${clientName}
+REACT_APP_COMPANY_NAME=${clientName}
+REACT_APP_DESCRIPTION=Sistema de CRM e Atendimento Integrado
+REACT_APP_COPYRIGHT=© 2024 ${clientName}. Todos os direitos reservados.
+REACT_APP_LOGO=/fernanda-logo.png
+NODE_ENV=production
+PORT=3000
+API_VERSION=v1
+SUPABASE_URL=${supabaseUrl}
+SUPABASE_ANON_KEY=${supabaseAnonKey}
+SUPABASE_SERVICE_ROLE_KEY=${supabaseServiceRoleKey}
+JWT_SECRET=__PREENCHER__
+JWT_EXPIRES_IN=24h
+FRONTEND_URL=${fUrl}
+ALLOWED_ORIGINS=${fUrl},${fUrl}
+BASE_URL=${bUrl}
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+TWILIO_ACCOUNT_SID=__PREENCHER__
+TWILIO_AUTH_TOKEN=__PREENCHER__
+TWILIO_PHONE_NUMBER=__PREENCHER__
+EVOLUTION_API_BASE_URL=__PREENCHER__
+EVOLUTION_API_INSTANCE=__PREENCHER__
+EVOLUTION_API_TOKEN=__PREENCHER__
+WHATSAPP_WEBHOOK_TOKEN=__PREENCHER__
+TELEGRAM_BOT_TOKEN=__PREENCHER__
+TELEGRAM_WEBHOOK_URL=__PREENCHER__
+SMTP_HOST=__PREENCHER__
+SMTP_PORT=__PREENCHER__
+SMTP_USER=__PREENCHER__
+SMTP_PASS=__PREENCHER__
+FROM_EMAIL=__PREENCHER__
+FROM_NAME=__PREENCHER__
+MAX_FILE_SIZE=10485760
+UPLOAD_PATH=./uploads
+ALLOWED_FILE_TYPES=image/jpeg,image/png,image/gif,application/pdf,text/plain
+LOG_LEVEL=info
+LOG_FILE_PATH=./logs/app.log
+WEBSOCKET_PORT=3002
+REACT_APP_SUPABASE_URL=${supabaseUrl}
+REACT_APP_SUPABASE_ANON_KEY=${supabaseAnonKey}
+REACT_APP_API_URL=${bUrl}/api/v1
+REACT_APP_WEBSOCKET_URL=wss://${backendDomain}
+REACT_APP_BACKEND_URL=${bUrl}
+REACT_APP_FRONTEND_URL=${fUrl}
+REACT_APP_EXECUTION_LIMIT=40000
+REACT_APP_DESCRIPTION=Sistema de gestão de leads
+REACT_APP_LOGO=/fernanda-logo
+REACT_APP_API_KEY=${apiKey}
+N8N_BASE_URL=__PREENCHER__
+VAPID_PUBLIC_KEY=__PREENCHER__
+VAPID_PRIVATE_KEY=__PREENCHER__`;
+
+      const backendEnv = `SUPABASE_URL=${supabaseUrl}
+SUPABASE_ANON_KEY=${supabaseAnonKey}
+SUPABASE_SERVICE_ROLE_KEY=${supabaseServiceRoleKey}
+N8N_WEBHOOK_URL=
+JWT_SECRET=__PREENCHER__
+JWT_EXPIRES_IN=24604800s
+ENABLE_CORS=true
+FRONTEND_URL=${fUrl}
+ALLOWED_ORIGINS=${fUrl},${fUrl},${fUrl}
+ALLOW_CREDENTIALS=true
+ALLOW_ALL_ORIGINS=false
+N8N_WEBHOOK_IA_ENABLED=true
+N8N_WEBHOOK_IA_URL=https://n8n-webhook.4fm0wd.easypanel.host/webhook/56c51de2-b6ab-4c72-af80
+N8N_WEBHOOK_IA_TIMEOUT=30000
+N8N_WEBHOOK_IA_RESPONSE_ENABLED=true
+N8N_RECOVERY_RESPONSE_WEBHOOK_URL=https://n8n-webhook.i2pq5v.easypanel.host/webhook/f28b382f
+BACKEND_URL=${bUrl}
+N8N_WEBHOOK_URL=
+N8N_WEBHOOK_URL_TELEGRAM=https://n8n-webhook.i2pq5v.easypanel.host/webhook/3aa0768d-1f8e-4d95-bafa-f681441faea3
+TELEGRAM_BOT_TOKEN=__PREENCHER__
+TELEGRAM_WEBHOOK_URL=${bUrl}/api/v1/webhooks/telegram
+N8N_API_KEY=__PREENCHER__
+N8N_DEFAULT_WORKFLOW_ID=__PREENCHER__
+N8N_EXECUTION_LIMIT=40000
+MOBIZON_API_KEY=__PREENCHER__
+MOBIZON_API_DOMAIN=__PREENCHER__
+BASE_URL=${bUrl}/api/v1
+N8N_BASE_URL=__PREENCHER__
+CRM_STAGE1_NAME=Novo Lead
+CRM_STAGE2_NAME=Quase comprou
+CRM_STAGE3_NAME=Compra paga
+CRM_STAGE4_NAME=4
+CRM_STAGE5_NAME=5
+CRM_STAGE6_NAME=6
+CRM_STAGE6_5_NAME=7
+CRM_STAGE7_NAME=8
+CRM_STAGE8_NAME=9
+CRM_AUTO_STAGE_ENABLED=false
+CRM_AUTO_STAGE_CASE_SENSITIVE=false
+CRM_AUTO_STAGE_PARTIAL_MATCH=true
+VAPI_API_KEY=__PREENCHER__
+VAPI_ASSISTANT_ID=__PREENCHER__
+VAPI_PHONE_NUMBER_ID=__PREENCHER__
+VAPID_PUBLIC_KEY=__PREENCHER__
+VAPID_PRIVATE_KEY=__PREENCHER__
+AUTHENTICATION_API_KEY=__PREENCHER__
+EVOLUTION_API_URL=__PREENCHER__
+EVOLUTION_API_TOKEN=__PREENCHER__
+EVOLUTION_API_BASE_URL=__PREENCHER__
+N8N_WEBHOOK_URL_YOUSHOP=__PREENCHER__
+N8N_RECOVERY_WEBHOOK_URL=__PREENCHER__
+CLOUDFLARE_R2_ACCOUNT_ID=__PREENCHER__
+CLOUDFLARE_R2_ACCESS_KEY_ID=__PREENCHER__
+CLOUDFLARE_R2_SECRET_ACCESS_KEY=__PREENCHER__
+CLOUDFLARE_R2_BUCKET_NAME=__PREENCHER__
+CLOUDFLARE_R2_PUBLIC_URL=__PREENCHER__
+N8N_PRESCRIPTION_WEBHOOK_URL=__PREENCHER__
+N8N_CERTIFICATE_WEBHOOK_URL=__PREENCHER__
+N8N_RECEIPT_WEBHOOK_URL=__PREENCHER__
+N8N_REFERRAL_WEBHOOK_URL=__PREENCHER__
+N8N_BUDGET_WEBHOOK_URL=__PREENCHER__
+FOCUSNFE_TOKEN=__PREENCHER__
+FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
+
+      function parseEnvOverrides(text) {
+        const out = {};
+        (text || '').split('\n').forEach(function (line) {
+          line = line.trim();
+          if (!line || line.startsWith('#')) return;
+          const i = line.indexOf('=');
+          if (i > 0) {
+            const k = line.slice(0, i).trim();
+            const v = line.slice(i + 1).trim();
+            if (k) out[k] = v;
+          }
+        });
+        return out;
+      }
+
+      function applyOverrides(envStr, overrides) {
+        if (!Object.keys(overrides).length) return envStr;
+        let out = envStr;
+        for (const [k, v] of Object.entries(overrides)) {
+          const esc = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          out = out.replace(new RegExp('^(' + esc + ')=.*$', 'm'), k + '=' + v);
+        }
+        return out;
+      }
+
+      const overrides = parseEnvOverrides(val('envOverrides'));
+      const frontendEnvFinal = applyOverrides(frontendEnv, overrides);
+      const backendEnvFinal = applyOverrides(backendEnv, overrides);
+
+      document.getElementById('frontendEnv').textContent = frontendEnvFinal;
+      document.getElementById('backendEnv').textContent = backendEnvFinal;
+      document.getElementById('infoFrontDomain').textContent = frontendDomain;
+      document.getElementById('infoBackDomain').textContent = backendDomain;
+
+      function envToOneLine(envStr) {
+        return envStr.split('\n').filter(l => l.trim() && !l.trim().startsWith('#')).join('\r\n');
+      }
+
+      const schema = {
+        services: [
+          {
+            type: 'app',
+            data: {
+              projectName: projectSlug,
+              serviceName: projectSlug + '_front',
+              source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_front', ref: 'master', path: '/', autoDeploy: false },
+              build: { type: 'dockerfile', file: 'Dockerfile' },
+              env: envToOneLine(frontendEnvFinal),
+              deploy: { replicas: 1, command: null, zeroDowntime: true },
+              domains: [{ host: frontendDomain, https: true, port: 3000, path: '/', wildcard: false, internalProtocol: 'http' }]
+            }
+          },
+          {
+            type: 'app',
+            data: {
+              projectName: projectSlug,
+              serviceName: projectSlug + '_back',
+              source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_back', ref: 'main', path: '/', autoDeploy: false },
+              build: { type: 'dockerfile', file: 'Dockerfile' },
+              env: envToOneLine(backendEnvFinal),
+              deploy: { replicas: 1, command: null, zeroDowntime: true },
+              domains: [{ host: backendDomain, https: true, port: 3001, path: '/', wildcard: false, internalProtocol: 'http' }]
+            }
+          }
+        ]
+      };
+      document.getElementById('schemaJson').textContent = JSON.stringify(schema, null, 2);
+      document.querySelectorAll('.output-section').forEach(s => s.classList.add('visible'));
+      document.getElementById('schemaJsonSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      localStorage.setItem('easypanel_last', JSON.stringify({
+        projectName: projectSlug, clientName, shortName, apiKey, frontendDomain, backendDomain,
+        supabaseUrl, supabaseAnonKey, supabaseServiceRoleKey
+      }));
+      showToast('Esquema gerado com sucesso!');
+    }
+
+    function switchToImageSource() {
+      const el = document.getElementById('schemaJson');
+      if (!el.textContent) { showToast('Gere o esquema primeiro!'); return; }
+      try {
+        const schema = JSON.parse(el.textContent);
+        schema.services.forEach(s => {
+          if (s.data && s.data.source) {
+            s.data.source = { type: 'image', image: 'node:18-alpine' };
+            delete s.data.build;
+          }
+        });
+        el.textContent = JSON.stringify(schema, null, 2);
+        showToast('Source trocado para image. Troque para GitHub no EasyPanel depois.');
+      } catch(e) { showToast('Erro ao modificar.'); }
+    }
+
+    (function restore() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('easypanel_last'));
+        if (!saved) return;
+        ['projectName','clientName','shortName','apiKey','frontendDomain','backendDomain','supabaseUrl','supabaseAnonKey','supabaseServiceRoleKey'].forEach(f => {
+          if (saved[f]) document.getElementById(f).value = saved[f];
+        });
+        if (saved.backendDomain) document.getElementById('backendDomain').dataset.manualEdit = 'true';
+        updatePreview();
+      } catch(e) {}
+    })();
+  </script>
+</body>
+</html>
