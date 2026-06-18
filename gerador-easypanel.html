@@ -504,7 +504,7 @@
           <br>
           <span class="badge-green">Após criar:</span>
           <ol>
-            <li>Se usou image: troque source para GitHub &rarr; <code>sunsetai485/sunset_front</code> branch <code>master</code> / <code>sunsetai485/sunset_back</code> branch <code>main</code></li>
+            <li>Se usou image: troque source para GitHub &rarr; <code>sunsetai485/klinvia_front</code> branch <code>master</code> / <code>sunsetai485/klinvia_back</code> branch <code>main</code></li>
             <li>Clique em <strong>Deploy</strong> em cada serviço</li>
             <li>Bolinha fica verde quando o build completar</li>
           </ol>
@@ -521,7 +521,7 @@
             <div class="info-title">Frontend</div>
             <div class="info-grid">
               <span class="label">Owner</span><span class="val">sunsetai485</span>
-              <span class="label">Repo</span><span class="val">sunset_front</span>
+              <span class="label">Repo</span><span class="val">klinvia_front</span>
               <span class="label">Branch</span><span class="val">master</span>
               <span class="label">Build</span><span class="val">Dockerfile</span>
               <span class="label">Porta</span><span class="val">3000</span>
@@ -532,7 +532,7 @@
             <div class="info-title">Backend</div>
             <div class="info-grid">
               <span class="label">Owner</span><span class="val">sunsetai485</span>
-              <span class="label">Repo</span><span class="val">sunset_back</span>
+              <span class="label">Repo</span><span class="val">klinvia_back</span>
               <span class="label">Branch</span><span class="val">main</span>
               <span class="label">Build</span><span class="val">Dockerfile</span>
               <span class="label">Porta</span><span class="val">3001</span>
@@ -981,7 +981,7 @@ CHAT_BOT_AUTO_ENABLE_ENABLED=true`;
             data: {
               projectName: projectName,
               serviceName: clientSlug + '_front',
-              source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_front', ref: 'master', path: '/', autoDeploy: false },
+              source: { type: 'github', owner: 'sunsetai485', repo: 'klinvia_front', ref: 'master', path: '/', autoDeploy: false },
               build: { type: 'dockerfile', file: 'Dockerfile' },
               env: envToOneLine(frontendEnvFinal),
               deploy: { replicas: 1, command: null, zeroDowntime: true },
@@ -993,7 +993,7 @@ CHAT_BOT_AUTO_ENABLE_ENABLED=true`;
             data: {
               projectName: projectName,
               serviceName: clientSlug + '_back',
-              source: { type: 'github', owner: 'sunsetai485', repo: 'sunset_back', ref: 'main', path: '/', autoDeploy: false },
+              source: { type: 'github', owner: 'sunsetai485', repo: 'klinvia_back', ref: 'main', path: '/', autoDeploy: false },
               build: { type: 'dockerfile', file: 'Dockerfile' },
               env: envToOneLine(backendEnvFinal),
               deploy: { replicas: 1, command: null, zeroDowntime: true },
