@@ -377,7 +377,7 @@
           <table class="mapping-table">
             <thead><tr><th>Campo</th><th>Variável</th><th>Derivação</th></tr></thead>
             <tbody>
-              <tr><td class="field-name">Nome do Cliente</td><td class="var-name">REACT_APP_NAME</td><td class="derivation">Sistema - {nome}</td></tr>
+              <tr><td class="field-name">Nome do Cliente</td><td class="var-name">REACT_APP_NAME</td><td class="derivation">{nome}</td></tr>
               <tr><td class="field-name">Nome Curto</td><td class="var-name">REACT_APP_SHORT_NAME</td><td class="derivation">Direto</td></tr>
               <tr><td class="field-name">Nome do Cliente</td><td class="var-name">REACT_APP_PLATFORM_NAME / COMPANY_NAME</td><td class="derivation">Direto</td></tr>
               <tr><td class="field-name">Supabase URL</td><td class="var-name">SUPABASE_URL / REACT_APP_SUPABASE_URL</td><td class="derivation">Direto</td></tr>
@@ -386,6 +386,8 @@
               <tr><td class="field-name">Domínio Frontend</td><td class="var-name">FRONTEND_URL / ALLOWED_ORIGINS / REACT_APP_FRONTEND_URL</td><td class="derivation">https://{dom}</td></tr>
               <tr><td class="field-name">Domínio Backend</td><td class="var-name">BASE_URL / API_URL / WEBSOCKET_URL / BACKEND_URL</td><td class="derivation">https:// / wss:// / /api/v1</td></tr>
               <tr><td class="field-name">API Key</td><td class="var-name">REACT_APP_API_KEY</td><td class="derivation">Direto</td></tr>
+              <tr><td class="field-name">Nome do Projeto</td><td class="var-name">REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN</td><td class="derivation">Slug do projeto</td></tr>
+              <tr><td class="field-name">Domínio Backend</td><td class="var-name">REACT_APP_EMBEDDED_SIGNUP_COMPLETE_URL_TEMPLATE</td><td class="derivation">{backend}/api/v1/whatsapp-cloud-api/embedded-signup/complete</td></tr>
             </tbody>
           </table>
         </div>
@@ -399,7 +401,10 @@
               <tr><td class="field-name">Supabase Anon Key</td><td class="var-name">SUPABASE_ANON_KEY</td><td class="derivation">Direto</td></tr>
               <tr><td class="field-name">Supabase Service Role</td><td class="var-name">SUPABASE_SERVICE_ROLE_KEY</td><td class="derivation">Direto</td></tr>
               <tr><td class="field-name">Domínio Frontend</td><td class="var-name">FRONTEND_URL / ALLOWED_ORIGINS</td><td class="derivation">https://{dom}</td></tr>
-              <tr><td class="field-name">Domínio Backend</td><td class="var-name">BACKEND_URL / BASE_URL / TELEGRAM_WEBHOOK_URL</td><td class="derivation">https:// / /api/v1</td></tr>
+              <tr><td class="field-name">Domínio Backend</td><td class="var-name">BACKEND_URL / BASE_URL / TELEGRAM_WEBHOOK_URL / TENANT_PUBLIC_API_BASE_URL</td><td class="derivation">https:// / /api/v1</td></tr>
+              <tr><td class="field-name">Nome do Projeto</td><td class="var-name">EMBEDDED_SIGNUP_TENANT_SUBDOMAIN</td><td class="derivation">Slug do projeto</td></tr>
+              <tr><td class="field-name">Domínio Frontend</td><td class="var-name">TELECONSULT_FRONTEND_BASE_URL</td><td class="derivation">https://{dom}</td></tr>
+              <tr><td class="field-name">Tokens / chaves</td><td class="var-name">JWT, N8N, Meta, OpenAI, XGate, WhatsApp Inboxes…</td><td class="derivation">Variáveis de ambiente do gerador</td></tr>
             </tbody>
           </table>
         </div>
@@ -624,8 +629,7 @@
     function val(id) { return (document.getElementById(id).value || '').trim(); }
 
     function getEnvExampleContent() {
-      return `# Cole as linhas abaixo no campo "Variáveis de ambiente" acima (ou preencha e use neste arquivo)
-# Formato: KEY=valor (uma por linha). Remova o # das linhas que preencher.
+      return `# Configure no EasyPanel do serviço gerador (formato KEY=valor, uma por linha)
 
 # === FRONTEND / BACKEND (comum) ===
 JWT_SECRET=__PREENCHER__
@@ -637,7 +641,6 @@ EVOLUTION_API_INSTANCE=__PREENCHER__
 EVOLUTION_API_TOKEN=__PREENCHER__
 WHATSAPP_WEBHOOK_TOKEN=__PREENCHER__
 TELEGRAM_BOT_TOKEN=__PREENCHER__
-TELEGRAM_WEBHOOK_URL=__PREENCHER__
 SMTP_HOST=__PREENCHER__
 SMTP_PORT=__PREENCHER__
 SMTP_USER=__PREENCHER__
@@ -647,27 +650,34 @@ FROM_NAME=__PREENCHER__
 N8N_BASE_URL=__PREENCHER__
 VAPID_PUBLIC_KEY=__PREENCHER__
 VAPID_PRIVATE_KEY=__PREENCHER__
+REACT_APP_EMBEDDED_SIGNUP_LAUNCHER_URL=__PREENCHER__
 
-# === BACKEND ===
+# === BACKEND - N8N / Integrações ===
+N8N_WEBHOOK_IA_URL=__PREENCHER__
+N8N_RECOVERY_RESPONSE_WEBHOOK_URL=__PREENCHER__
+N8N_WEBHOOK_URL_TELEGRAM=__PREENCHER__
 N8N_API_KEY=__PREENCHER__
 N8N_DEFAULT_WORKFLOW_ID=__PREENCHER__
 MOBIZON_API_KEY=__PREENCHER__
 MOBIZON_API_DOMAIN=__PREENCHER__
-N8N_BASE_URL=__PREENCHER__
 VAPI_API_KEY=__PREENCHER__
 VAPI_ASSISTANT_ID=__PREENCHER__
 VAPI_PHONE_NUMBER_ID=__PREENCHER__
 AUTHENTICATION_API_KEY=__PREENCHER__
 EVOLUTION_API_URL=__PREENCHER__
 EVOLUTION_API_TOKEN=__PREENCHER__
-EVOLUTION_API_BASE_URL=__PREENCHER__
 N8N_WEBHOOK_URL_YOUSHOP=__PREENCHER__
 N8N_RECOVERY_WEBHOOK_URL=__PREENCHER__
+N8N_EVOLUTION_WEBHOOK_URL=__PREENCHER__
+
+# === BACKEND - Cloudflare R2 ===
 CLOUDFLARE_R2_ACCOUNT_ID=__PREENCHER__
 CLOUDFLARE_R2_ACCESS_KEY_ID=__PREENCHER__
 CLOUDFLARE_R2_SECRET_ACCESS_KEY=__PREENCHER__
 CLOUDFLARE_R2_BUCKET_NAME=__PREENCHER__
 CLOUDFLARE_R2_PUBLIC_URL=__PREENCHER__
+
+# === BACKEND - Webhooks documentos ===
 N8N_PRESCRIPTION_WEBHOOK_URL=__PREENCHER__
 N8N_CERTIFICATE_WEBHOOK_URL=__PREENCHER__
 N8N_RECEIPT_WEBHOOK_URL=__PREENCHER__
@@ -675,6 +685,54 @@ N8N_REFERRAL_WEBHOOK_URL=__PREENCHER__
 N8N_BUDGET_WEBHOOK_URL=__PREENCHER__
 FOCUSNFE_TOKEN=__PREENCHER__
 FOCUSNFE_ENVIRONMENT=__PREENCHER__
+
+# === BACKEND - WhatsApp Inboxes ===
+WHATSAPP_INBOX_1_TYPE=__PREENCHER__
+WHATSAPP_INBOX_1_NAME=__PREENCHER__
+WHATSAPP_INBOX_1_PROVIDER=__PREENCHER__
+WHATSAPP_INBOX_1_INSTANCE_ID=__PREENCHER__
+WHATSAPP_INBOX_1_N8N_WEBHOOK_URL=__PREENCHER__
+WHATSAPP_INBOX_1_UNIT_ID=__PREENCHER__
+WHATSAPP_INBOX_1_CRM_PIPELINE_NAME=__PREENCHER__
+WHATSAPP_INBOX_2_TYPE=__PREENCHER__
+WHATSAPP_INBOX_2_NAME=__PREENCHER__
+WHATSAPP_INBOX_2_PROVIDER=__PREENCHER__
+WHATSAPP_INBOX_2_INSTANCE_ID=__PREENCHER__
+WHATSAPP_INBOX_2_N8N_WEBHOOK_URL=__PREENCHER__
+WHATSAPP_INBOX_2_UNIT_ID=__PREENCHER__
+WHATSAPP_INBOX_2_CRM_PIPELINE_NAME=__PREENCHER__
+WHATSAPP_INBOX_3_TYPE=__PREENCHER__
+WHATSAPP_INBOX_3_NAME=__PREENCHER__
+WHATSAPP_INBOX_3_PROVIDER=__PREENCHER__
+WHATSAPP_INBOX_3_INSTANCE_ID=__PREENCHER__
+WHATSAPP_INBOX_3_N8N_WEBHOOK_URL=__PREENCHER__
+WHATSAPP_INBOX_3_UNIT_ID=__PREENCHER__
+WHATSAPP_INBOX_3_CRM_PIPELINE_NAME=__PREENCHER__
+
+# === BACKEND - Meta / Embedded Signup ===
+CLINIC_SCHEDULING_AUTOMATION_API_KEY=__PREENCHER__
+META_APP_ID=__PREENCHER__
+META_CONFIG_ID=__PREENCHER__
+META_APP_SECRET=__PREENCHER__
+META_SYSTEM_USER_TOKEN=__PREENCHER__
+META_REDIRECT_URI=__PREENCHER__
+EMBEDDED_SIGNUP_ALLOWED_ORIGINS=__PREENCHER__
+WEBHOOK_DISPATCHER_BASE_URL=__PREENCHER__
+WEBHOOK_DISPATCHER_PROVISIONING_SECRET=__PREENCHER__
+WHATSAPP_BUSINESS_VERIFY_TOKEN=__PREENCHER__
+
+# === BACKEND - OpenAI / Teleconsulta / XGate / Billing ===
+OPENAI_API_KEY=__PREENCHER__
+TELECONSULT_JWT_SECRET=__PREENCHER__
+TELECONSULT_INTERNAL_HOOK_SECRET=__PREENCHER__
+TELECONSULT_N8N_TRANSCRIPTION_WEBHOOK_URL=__PREENCHER__
+TELECONSULT_R2_PUBLIC_URL=__PREENCHER__
+XGATE_EMAIL=__PREENCHER__
+XGATE_PASSWORD=__PREENCHER__
+PLATFORM_PLAN_MONTHLY_CENTS=__PREENCHER__
+PLATFORM_PLAN_DUE_DAY=__PREENCHER__
+PLATFORM_BILLING_NAME=__PREENCHER__
+PLATFORM_BILLING_DOCUMENT=__PREENCHER__
 `;
     }
 
@@ -696,8 +754,9 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__
 
       const fUrl = 'https://' + frontendDomain;
       const bUrl = 'https://' + backendDomain;
+      const apiV1 = bUrl + '/api/v1';
 
-      const frontendEnv = `REACT_APP_NAME=Sistema - ${clientName}
+      const frontendEnv = `REACT_APP_NAME=${clientName}
 REACT_APP_SHORT_NAME=${shortName}
 REACT_APP_PLATFORM_NAME=${clientName}
 REACT_APP_COMPANY_NAME=${clientName}
@@ -725,7 +784,7 @@ EVOLUTION_API_INSTANCE=__PREENCHER__
 EVOLUTION_API_TOKEN=__PREENCHER__
 WHATSAPP_WEBHOOK_TOKEN=__PREENCHER__
 TELEGRAM_BOT_TOKEN=__PREENCHER__
-TELEGRAM_WEBHOOK_URL=__PREENCHER__
+TELEGRAM_WEBHOOK_URL=${apiV1}/webhooks/telegram
 SMTP_HOST=__PREENCHER__
 SMTP_PORT=__PREENCHER__
 SMTP_USER=__PREENCHER__
@@ -740,17 +799,18 @@ LOG_FILE_PATH=./logs/app.log
 WEBSOCKET_PORT=3002
 REACT_APP_SUPABASE_URL=${supabaseUrl}
 REACT_APP_SUPABASE_ANON_KEY=${supabaseAnonKey}
-REACT_APP_API_URL=${bUrl}/api/v1
+REACT_APP_API_URL=${apiV1}
 REACT_APP_WEBSOCKET_URL=wss://${backendDomain}
 REACT_APP_BACKEND_URL=${bUrl}
 REACT_APP_FRONTEND_URL=${fUrl}
 REACT_APP_EXECUTION_LIMIT=40000
-REACT_APP_DESCRIPTION=Sistema de gestão de leads
-REACT_APP_LOGO=/fernanda-logo
 REACT_APP_API_KEY=${apiKey}
 N8N_BASE_URL=__PREENCHER__
 VAPID_PUBLIC_KEY=__PREENCHER__
-VAPID_PRIVATE_KEY=__PREENCHER__`;
+VAPID_PRIVATE_KEY=__PREENCHER__
+REACT_APP_EMBEDDED_SIGNUP_LAUNCHER_URL=__PREENCHER__
+REACT_APP_EMBEDDED_SIGNUP_COMPLETE_URL_TEMPLATE=${apiV1}/whatsapp-cloud-api/embedded-signup/complete
+REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN=${projectName}`;
 
       const backendEnv = `SUPABASE_URL=${supabaseUrl}
 SUPABASE_ANON_KEY=${supabaseAnonKey}
@@ -764,28 +824,29 @@ ALLOWED_ORIGINS=${fUrl},${fUrl},${fUrl}
 ALLOW_CREDENTIALS=true
 ALLOW_ALL_ORIGINS=false
 N8N_WEBHOOK_IA_ENABLED=true
-N8N_WEBHOOK_IA_URL=https://n8n-webhook.4fm0wd.easypanel.host/webhook/56c51de2-b6ab-4c72-af80
+N8N_WEBHOOK_IA_URL=__PREENCHER__
 N8N_WEBHOOK_IA_TIMEOUT=30000
 N8N_WEBHOOK_IA_RESPONSE_ENABLED=true
-N8N_RECOVERY_RESPONSE_WEBHOOK_URL=https://n8n-webhook.i2pq5v.easypanel.host/webhook/f28b382f
+N8N_RECOVERY_RESPONSE_WEBHOOK_URL=__PREENCHER__
+CLOUD_API_MESSAGE_GROUPING_TIMEOUT=5000
 BACKEND_URL=${bUrl}
 N8N_WEBHOOK_URL=
-N8N_WEBHOOK_URL_TELEGRAM=https://n8n-webhook.i2pq5v.easypanel.host/webhook/3aa0768d-1f8e-4d95-bafa-f681441faea3
+N8N_WEBHOOK_URL_TELEGRAM=__PREENCHER__
 TELEGRAM_BOT_TOKEN=__PREENCHER__
-TELEGRAM_WEBHOOK_URL=${bUrl}/api/v1/webhooks/telegram
+TELEGRAM_WEBHOOK_URL=${apiV1}/webhooks/telegram
 N8N_API_KEY=__PREENCHER__
 N8N_DEFAULT_WORKFLOW_ID=__PREENCHER__
 N8N_EXECUTION_LIMIT=40000
 MOBIZON_API_KEY=__PREENCHER__
 MOBIZON_API_DOMAIN=__PREENCHER__
-BASE_URL=${bUrl}/api/v1
+BASE_URL=${apiV1}
 N8N_BASE_URL=__PREENCHER__
-CRM_STAGE1_NAME=Novo Lead
-CRM_STAGE2_NAME=Quase comprou
-CRM_STAGE3_NAME=Compra paga
-CRM_STAGE4_NAME=4
-CRM_STAGE5_NAME=5
-CRM_STAGE6_NAME=6
+CRM_STAGE1_NAME=Novo Paciente
+CRM_STAGE2_NAME=Em Qualificação
+CRM_STAGE3_NAME=Pendente de Agendamento
+CRM_STAGE4_NAME=Atenção Especial
+CRM_STAGE5_NAME=Agendamento Confirmado
+CRM_STAGE6_NAME=Objeção
 CRM_STAGE6_5_NAME=7
 CRM_STAGE7_NAME=8
 CRM_STAGE8_NAME=9
@@ -813,8 +874,64 @@ N8N_CERTIFICATE_WEBHOOK_URL=__PREENCHER__
 N8N_RECEIPT_WEBHOOK_URL=__PREENCHER__
 N8N_REFERRAL_WEBHOOK_URL=__PREENCHER__
 N8N_BUDGET_WEBHOOK_URL=__PREENCHER__
+N8N_EVOLUTION_WEBHOOK_URL=__PREENCHER__
 FOCUSNFE_TOKEN=__PREENCHER__
-FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
+FOCUSNFE_ENVIRONMENT=__PREENCHER__
+WHATSAPP_INBOX_1_TYPE=__PREENCHER__
+WHATSAPP_INBOX_1_NAME=__PREENCHER__
+WHATSAPP_INBOX_1_PROVIDER=__PREENCHER__
+WHATSAPP_INBOX_1_INSTANCE_ID=__PREENCHER__
+WHATSAPP_INBOX_1_N8N_WEBHOOK_URL=__PREENCHER__
+WHATSAPP_INBOX_1_UNIT_ID=__PREENCHER__
+WHATSAPP_INBOX_1_CRM_PIPELINE_NAME=__PREENCHER__
+WHATSAPP_INBOX_2_TYPE=__PREENCHER__
+WHATSAPP_INBOX_2_NAME=__PREENCHER__
+WHATSAPP_INBOX_2_PROVIDER=__PREENCHER__
+WHATSAPP_INBOX_2_INSTANCE_ID=__PREENCHER__
+WHATSAPP_INBOX_2_N8N_WEBHOOK_URL=__PREENCHER__
+WHATSAPP_INBOX_2_UNIT_ID=__PREENCHER__
+WHATSAPP_INBOX_2_CRM_PIPELINE_NAME=__PREENCHER__
+WHATSAPP_INBOX_3_TYPE=__PREENCHER__
+WHATSAPP_INBOX_3_NAME=__PREENCHER__
+WHATSAPP_INBOX_3_PROVIDER=__PREENCHER__
+WHATSAPP_INBOX_3_INSTANCE_ID=__PREENCHER__
+WHATSAPP_INBOX_3_N8N_WEBHOOK_URL=__PREENCHER__
+WHATSAPP_INBOX_3_UNIT_ID=__PREENCHER__
+WHATSAPP_INBOX_3_CRM_PIPELINE_NAME=__PREENCHER__
+CLINIC_SCHEDULING_AUTOMATION_API_KEY=__PREENCHER__
+META_APP_ID=__PREENCHER__
+META_CONFIG_ID=__PREENCHER__
+META_APP_SECRET=__PREENCHER__
+META_GRAPH_VERSION=v23.0
+META_SYSTEM_USER_TOKEN=__PREENCHER__
+EMBEDDED_SIGNUP_TENANT_SUBDOMAIN=${projectName}
+META_REDIRECT_URI=__PREENCHER__
+EMBEDDED_SIGNUP_ALLOWED_ORIGINS=__PREENCHER__
+WEBHOOK_DISPATCHER_BASE_URL=__PREENCHER__
+WEBHOOK_DISPATCHER_PROVISIONING_SECRET=__PREENCHER__
+TENANT_PUBLIC_API_BASE_URL=${bUrl}
+WHATSAPP_BUSINESS_VERIFY_TOKEN=__PREENCHER__
+OPENAI_API_KEY=__PREENCHER__
+TELECONSULT_ENABLED=true
+TELECONSULT_JITSI_DOMAIN=meet.pooh.pro
+TELECONSULT_JWT_APP_ID=pooh_clinic
+TELECONSULT_JWT_SECRET=__PREENCHER__
+TELECONSULT_JWT_ISSUER=pooh_clinic
+TELECONSULT_JWT_AUDIENCE=jitsi
+TELECONSULT_FRONTEND_BASE_URL=${fUrl}
+TELECONSULT_RECORDING_ENABLED=true
+TELECONSULT_INTERNAL_HOOK_SECRET=__PREENCHER__
+TELECONSULT_N8N_TRANSCRIPTION_WEBHOOK_URL=__PREENCHER__
+API_PUBLIC_BASE_URL=${bUrl}
+TELECONSULT_R2_PUBLIC_URL=__PREENCHER__
+XGATE_ENABLED=true
+XGATE_EMAIL=__PREENCHER__
+XGATE_PASSWORD=__PREENCHER__
+PLATFORM_PLAN_MONTHLY_CENTS=__PREENCHER__
+PLATFORM_PLAN_DUE_DAY=__PREENCHER__
+PLATFORM_BILLING_NAME=__PREENCHER__
+PLATFORM_BILLING_DOCUMENT=__PREENCHER__
+CHAT_BOT_AUTO_ENABLE_ENABLED=true`;
 
       function parseEnvOverrides(text) {
         const out = {};
@@ -836,7 +953,7 @@ FOCUSNFE_ENVIRONMENT=__PREENCHER__`;
         let out = envStr;
         for (const [k, v] of Object.entries(overrides)) {
           const esc = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          out = out.replace(new RegExp('^(' + esc + ')=.*$', 'm'), k + '=' + v);
+          out = out.replace(new RegExp('^(' + esc + ')=.*$', 'gm'), k + '=' + v);
         }
         return out;
       }
