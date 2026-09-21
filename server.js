@@ -70,12 +70,12 @@ const server = http.createServer((req, res) => {
       return;
     }
     const tokens = getEnvTokens();
-    const injected = html.replace('__POOH_ENV_JSON__', JSON.stringify(tokens));
+    const injected = html.replace('__KLINVIA_ENV_JSON__', JSON.stringify(tokens));
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.end(injected);
   });
 });
 
 server.listen(PORT, () => {
-  console.log('Pooh Deploy listening on port', PORT);
+  console.log('Gerador Klinvia listening on port', PORT);
 });

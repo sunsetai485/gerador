@@ -3,26 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pooh - Gerador de Esquema EasyPanel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>Gerador Klinvia — EasyPanel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f5f7fa;
-      --surface: #ffffff;
-      --surface-2: #f0f2f5;
-      --border: #e4e8ee;
-      --border-hover: #c8cfd8;
-      --text: #2d3748;
-      --text-muted: #718096;
-      --text-light: #a0aec0;
-      --primary: #1db9a8;
-      --primary-light: #e6f7f5;
-      --primary-dark: #179e8f;
-      --primary-glow: rgba(29, 185, 168, 0.15);
-      --accent-orange: #f6a623;
-      --accent-orange-bg: #fef8eb;
+      --bg: #F5F8FB;
+      --surface: #FFFFFF;
+      --surface-2: #ECF1F7;
+      --border: rgba(10, 14, 26, 0.1);
+      --border-hover: rgba(10, 14, 26, 0.15);
+      --text: #0A0E1A;
+      --text-muted: #5A6582;
+      --text-light: #8B95AB;
+      --primary: #00B8CC;
+      --primary-bright: #00E5FF;
+      --primary-deep: #2B7CC4;
+      --primary-light: rgba(0, 184, 204, 0.1);
+      --primary-dark: #2B7CC4;
+      --primary-glow: rgba(0, 184, 204, 0.22);
+      --grad-primary: linear-gradient(135deg, #00B8CC 0%, #2B7CC4 100%);
+      --accent-secondary-bg: rgba(0, 184, 204, 0.08);
       --red: #e53e3e;
       --radius: 16px;
       --radius-sm: 10px;
@@ -31,7 +33,7 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
@@ -71,7 +73,14 @@
     .header h1 {
       font-size: 28px;
       font-weight: 700;
-      color: var(--primary);
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .header h1 .brand {
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .header p {
       color: var(--text-muted);
@@ -139,7 +148,7 @@
     /* Derived preview */
     .derived-preview {
       background: var(--primary-light);
-      border: 1px solid rgba(29, 185, 168, 0.2);
+      border: 1px solid rgba(0, 184, 204, 0.25);
       border-radius: var(--radius-sm);
       padding: 14px 16px;
       margin-top: 16px;
@@ -171,7 +180,7 @@
     .btn-generate {
       width: 100%;
       padding: 15px;
-      background: var(--primary);
+      background: var(--grad-primary);
       color: white;
       font-size: 15px;
       font-weight: 600;
@@ -183,9 +192,9 @@
       box-shadow: 0 2px 8px var(--primary-glow);
     }
     .btn-generate:hover {
-      background: var(--primary-dark);
+      filter: brightness(1.05);
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px var(--primary-glow);
+      box-shadow: 0 4px 20px var(--primary-glow);
     }
     .btn-generate:active { transform: translateY(0); }
 
@@ -210,15 +219,15 @@
     .btn-copy {
       background: var(--primary-light);
       color: var(--primary-dark);
-      border-color: rgba(29, 185, 168, 0.3);
+      border-color: rgba(0, 184, 204, 0.35);
     }
-    .btn-copy:hover { background: rgba(29, 185, 168, 0.15); }
+    .btn-copy:hover { background: rgba(0, 184, 204, 0.14); }
     .btn-download {
-      background: var(--accent-orange-bg);
-      color: #c47f17;
-      border-color: rgba(246, 166, 35, 0.3);
+      background: var(--accent-secondary-bg);
+      color: var(--primary-deep);
+      border-color: rgba(43, 124, 196, 0.25);
     }
-    .btn-download:hover { background: rgba(246, 166, 35, 0.12); }
+    .btn-download:hover { background: rgba(0, 184, 204, 0.12); }
 
     /* Output box */
     .output-box {
@@ -238,7 +247,7 @@
       white-space: pre;
       max-height: 500px;
       overflow-y: auto;
-      background: #fafbfc;
+      background: var(--bg);
     }
     .output-box pre::-webkit-scrollbar { width: 6px; height: 6px; }
     .output-box pre::-webkit-scrollbar-track { background: transparent; }
@@ -302,7 +311,7 @@
       border: none;
       background: transparent;
     }
-    .tab.active { background: var(--primary); color: white; }
+    .tab.active { background: var(--grad-primary); color: white; }
     .tab:hover:not(.active) { background: var(--surface); color: var(--text); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -342,7 +351,7 @@
       font-size: 12px;
       color: var(--primary-dark);
     }
-    .badge-orange { color: #c47f17; font-weight: 600; }
+    .badge-orange { color: var(--primary-deep); font-weight: 600; }
     .badge-green { color: var(--primary-dark); font-weight: 600; }
 
     @media (max-width: 640px) {
@@ -355,14 +364,14 @@
   </style>
 </head>
 <body>
-  <script>window.POOH_ENV_TOKENS = (function(){ try { return __POOH_ENV_JSON__; } catch(e) { return {}; } })();</script>
+  <script>window.KLINVIA_ENV_TOKENS = (function(){ try { return __KLINVIA_ENV_JSON__; } catch(e) { return {}; } })();</script>
   <div class="toast-container" id="toastContainer"></div>
 
   <div class="header">
     <div class="header-logo">
-      <h1>Pooh Deploy</h1>
+      <h1><span class="brand">Klinvia</span> Gerador</h1>
     </div>
-    <p>Gerador de esquema EasyPanel para novos clientes</p>
+    <p>Esquema EasyPanel para novos clientes da plataforma</p>
   </div>
 
   <div class="container">
@@ -446,12 +455,12 @@
         <div class="field-grid">
           <div class="field">
             <label>Domínio Frontend <span class="required">*</span></label>
-            <input type="text" id="frontendDomain" placeholder="Ex: cuiaba.pooh.pro" required oninput="autoDeriveDomains()">
+            <input type="text" id="frontendDomain" placeholder="Ex: unica.klinvia.com" required oninput="autoDeriveDomains()">
             <span class="hint">Sem https:// — apenas o domínio</span>
           </div>
           <div class="field">
             <label>Domínio Backend <span class="required">*</span></label>
-            <input type="text" id="backendDomain" placeholder="Ex: api.cuiaba.pooh.pro" required>
+            <input type="text" id="backendDomain" placeholder="Ex: api.unica.klinvia.com" required>
             <span class="hint">Auto: api.{frontend}</span>
           </div>
         </div>
@@ -632,7 +641,7 @@
     function val(id) { return (document.getElementById(id).value || '').trim(); }
 
     function getEnvExampleContent() {
-      return `# Configure no EasyPanel do serviço gerador (formato KEY=valor, uma por linha)
+      return `# Gerador Klinvia — configure no EasyPanel (formato KEY=valor, uma por linha)
 
 # === FRONTEND / BACKEND (comum) ===
 JWT_SECRET=__PREENCHER__
@@ -995,7 +1004,7 @@ CHAT_BOT_AUTO_ENABLE_ENABLED=true`;
         return envStr.replace(/=__PREENCHER__$/gm, '=');
       }
 
-      const overrides = (typeof window.POOH_ENV_TOKENS === 'object' && window.POOH_ENV_TOKENS !== null) ? window.POOH_ENV_TOKENS : {};
+      const overrides = (typeof window.KLINVIA_ENV_TOKENS === 'object' && window.KLINVIA_ENV_TOKENS !== null) ? window.KLINVIA_ENV_TOKENS : {};
       const frontendEnvFinal = stripPlaceholders(applyOverrides(frontendEnv, overrides));
       const backendEnvFinal = stripPlaceholders(applyOverrides(backendEnv, overrides));
 

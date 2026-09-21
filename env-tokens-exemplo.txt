@@ -1,4 +1,4 @@
-# Pooh Deploy - Variáveis de ambiente do serviço gerador (EasyPanel)
+# Gerador Klinvia - Variáveis de ambiente do serviço gerador (EasyPanel)
 # Formato: KEY=valor (uma por linha). Sem # no início da linha.
 
 # === FRONTEND / BACKEND (comum) ===
