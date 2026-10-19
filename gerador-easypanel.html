@@ -473,7 +473,7 @@
           <div class="derived-item"><span class="key">BACKEND_URL</span><span class="value" id="prevBackUrl">—</span></div>
           <div class="derived-item"><span class="key">TELEGRAM_WEBHOOK_URL</span><span class="value" id="prevTgUrl">—</span></div>
           <div class="derived-item"><span class="key">REACT_APP_EMBEDDED_SIGNUP_COMPLETE_URL_TEMPLATE</span><span class="value" id="prevEmbeddedComplete">—</span></div>
-          <div class="derived-item"><span class="key">REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN</span><span class="value" id="prevEmbeddedTenant">—</span></div>
+          <div class="derived-item"><span class="key">REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN / BILLING_TENANT_SLUG</span><span class="value" id="prevEmbeddedTenant">—</span></div>
         </div>
       </div>
 
@@ -1032,10 +1032,26 @@ MASTER_SUPPORT_TOTP_SECRET=__PREENCHER__`;
       function stripPlaceholders(envStr) {
         return envStr.replace(/=__PREENCHER__$/gm, '=');
       }
+      function forceEnvKeys(envStr, keyValues) {
+        let out = envStr;
+        for (const [k, v] of Object.entries(keyValues)) {
+          const esc = k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          if (new RegExp('^' + esc + '=', 'm').test(out)) {
+            out = out.replace(new RegExp('^(' + esc + ')=.*$', 'gm'), k + '=' + v);
+          }
+        }
+        return out;
+      }
 
       const overrides = (typeof window.KLINVIA_ENV_TOKENS === 'object' && window.KLINVIA_ENV_TOKENS !== null) ? window.KLINVIA_ENV_TOKENS : {};
-      const frontendEnvFinal = stripPlaceholders(applyOverrides(frontendEnv, overrides));
-      const backendEnvFinal = stripPlaceholders(applyOverrides(backendEnv, overrides));
+      const tenantSlug = projectName;
+      const frontendEnvFinal = stripPlaceholders(forceEnvKeys(applyOverrides(frontendEnv, overrides), {
+        REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN: tenantSlug
+      }));
+      const backendEnvFinal = stripPlaceholders(forceEnvKeys(applyOverrides(backendEnv, overrides), {
+        BILLING_TENANT_SLUG: tenantSlug,
+        EMBEDDED_SIGNUP_TENANT_SUBDOMAIN: tenantSlug
+      }));
 
       document.getElementById('frontendEnv').textContent = frontendEnvFinal;
       document.getElementById('backendEnv').textContent = backendEnvFinal;
