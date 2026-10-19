@@ -395,8 +395,9 @@
               <tr><td class="field-name">Domínio Frontend</td><td class="var-name">FRONTEND_URL / ALLOWED_ORIGINS / REACT_APP_FRONTEND_URL</td><td class="derivation">https://{dom}</td></tr>
               <tr><td class="field-name">Domínio Backend</td><td class="var-name">BASE_URL / API_URL / WEBSOCKET_URL / BACKEND_URL</td><td class="derivation">https:// / wss:// / /api/v1</td></tr>
               <tr><td class="field-name">API Key</td><td class="var-name">REACT_APP_API_KEY</td><td class="derivation">Direto</td></tr>
-              <tr><td class="field-name">Nome do Projeto</td><td class="var-name">REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN</td><td class="derivation">Slug do projeto</td></tr>
-              <tr><td class="field-name">Domínio Backend</td><td class="var-name">REACT_APP_EMBEDDED_SIGNUP_COMPLETE_URL_TEMPLATE</td><td class="derivation">{backend}/api/v1/whatsapp-cloud-api/embedded-signup/complete</td></tr>
+              <tr><td class="field-name">Tokens (gerador)</td><td class="var-name">REACT_APP_EMBEDDED_SIGNUP_LAUNCHER_URL</td><td class="derivation">URL do launcher (ex: app.klinvia.com)</td></tr>
+              <tr><td class="field-name">Nome do Projeto</td><td class="var-name">REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN</td><td class="derivation">Slug do tenant (ex: ldo)</td></tr>
+              <tr><td class="field-name">Domínio Backend</td><td class="var-name">REACT_APP_EMBEDDED_SIGNUP_COMPLETE_URL_TEMPLATE</td><td class="derivation">https://{backend}/api/v1/whatsapp-cloud-api/embedded-signup/complete (front deriva /finish-relay)</td></tr>
             </tbody>
           </table>
         </div>
@@ -429,8 +430,8 @@
         <div class="field-grid">
           <div class="field">
             <label>Nome do Projeto (EasyPanel) <span class="required">*</span></label>
-            <input type="text" id="projectName" placeholder="Ex: cuiaba" required oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
-            <span class="hint">Slug minúsculo, sem espaços. Usado como projectName no EasyPanel.</span>
+            <input type="text" id="projectName" placeholder="Ex: ldo" required oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
+            <span class="hint">Slug do tenant (ex: ldo). EasyPanel projectName e REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN.</span>
           </div>
           <div class="field">
             <label>Nome do Cliente <span class="required">*</span></label>
@@ -471,6 +472,8 @@
           <div class="derived-item"><span class="key">REACT_APP_WEBSOCKET_URL</span><span class="value" id="prevWsUrl">—</span></div>
           <div class="derived-item"><span class="key">BACKEND_URL</span><span class="value" id="prevBackUrl">—</span></div>
           <div class="derived-item"><span class="key">TELEGRAM_WEBHOOK_URL</span><span class="value" id="prevTgUrl">—</span></div>
+          <div class="derived-item"><span class="key">REACT_APP_EMBEDDED_SIGNUP_COMPLETE_URL_TEMPLATE</span><span class="value" id="prevEmbeddedComplete">—</span></div>
+          <div class="derived-item"><span class="key">REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN</span><span class="value" id="prevEmbeddedTenant">—</span></div>
         </div>
       </div>
 
@@ -589,6 +592,7 @@
     }
     document.getElementById('backendDomain').addEventListener('input', function () { this.dataset.manualEdit = 'true'; updatePreview(); });
     document.getElementById('frontendDomain').addEventListener('input', function () { document.getElementById('backendDomain').dataset.manualEdit = ''; });
+    document.getElementById('projectName').addEventListener('input', updatePreview);
 
     function updatePreview() {
       const fd = document.getElementById('frontendDomain').value.trim();
@@ -601,6 +605,9 @@
         document.getElementById('prevWsUrl').textContent = bd ? 'wss://' + bd : '—';
         document.getElementById('prevBackUrl').textContent = bd ? 'https://' + bd : '—';
         document.getElementById('prevTgUrl').textContent = bd ? 'https://' + bd + '/api/v1/webhooks/telegram' : '—';
+        document.getElementById('prevEmbeddedComplete').textContent = bd ? 'https://' + bd + '/api/v1/whatsapp-cloud-api/embedded-signup/complete' : '—';
+        const tenant = (document.getElementById('projectName').value || '').trim();
+        document.getElementById('prevEmbeddedTenant').textContent = tenant || '—';
       } else { preview.style.display = 'none'; }
     }
 
@@ -653,16 +660,17 @@ EVOLUTION_API_INSTANCE=__PREENCHER__
 EVOLUTION_API_TOKEN=__PREENCHER__
 WHATSAPP_WEBHOOK_TOKEN=__PREENCHER__
 TELEGRAM_BOT_TOKEN=__PREENCHER__
-SMTP_HOST=__PREENCHER__
-SMTP_PORT=__PREENCHER__
-SMTP_USER=__PREENCHER__
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=contato@klinvia.com
 SMTP_PASS=__PREENCHER__
-FROM_EMAIL=__PREENCHER__
-FROM_NAME=__PREENCHER__
+FROM_EMAIL=contato@klinvia.com
+FROM_NAME=Klinvia
 N8N_BASE_URL=__PREENCHER__
 VAPID_PUBLIC_KEY=__PREENCHER__
 VAPID_PRIVATE_KEY=__PREENCHER__
-REACT_APP_EMBEDDED_SIGNUP_LAUNCHER_URL=__PREENCHER__
+REACT_APP_EMBEDDED_SIGNUP_LAUNCHER_URL=https://app.klinvia.com/embedded-signup-launcher
 
 # === BACKEND - N8N / Integrações ===
 N8N_WEBHOOK_IA_URL=__PREENCHER__
@@ -821,6 +829,7 @@ TELEGRAM_BOT_TOKEN=__PREENCHER__
 TELEGRAM_WEBHOOK_URL=${apiV1}/webhooks/telegram
 SMTP_HOST=__PREENCHER__
 SMTP_PORT=__PREENCHER__
+SMTP_SECURE=__PREENCHER__
 SMTP_USER=__PREENCHER__
 SMTP_PASS=__PREENCHER__
 FROM_EMAIL=__PREENCHER__
@@ -839,12 +848,12 @@ REACT_APP_BACKEND_URL=${bUrl}
 REACT_APP_FRONTEND_URL=${fUrl}
 REACT_APP_EXECUTION_LIMIT=40000
 REACT_APP_API_KEY=${apiKey}
-N8N_BASE_URL=__PREENCHER__
-VAPID_PUBLIC_KEY=__PREENCHER__
-VAPID_PRIVATE_KEY=__PREENCHER__
 REACT_APP_EMBEDDED_SIGNUP_LAUNCHER_URL=__PREENCHER__
 REACT_APP_EMBEDDED_SIGNUP_COMPLETE_URL_TEMPLATE=${apiV1}/whatsapp-cloud-api/embedded-signup/complete
-REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN=${projectName}`;
+REACT_APP_EMBEDDED_SIGNUP_TENANT_SUBDOMAIN=${projectName}
+N8N_BASE_URL=__PREENCHER__
+VAPID_PUBLIC_KEY=__PREENCHER__
+VAPID_PRIVATE_KEY=__PREENCHER__`;
 
       const backendEnv = `SUPABASE_URL=${supabaseUrl}
 SUPABASE_ANON_KEY=${supabaseAnonKey}
@@ -868,6 +877,13 @@ N8N_WEBHOOK_URL=
 N8N_WEBHOOK_URL_TELEGRAM=__PREENCHER__
 TELEGRAM_BOT_TOKEN=__PREENCHER__
 TELEGRAM_WEBHOOK_URL=${apiV1}/webhooks/telegram
+SMTP_HOST=__PREENCHER__
+SMTP_PORT=__PREENCHER__
+SMTP_SECURE=__PREENCHER__
+SMTP_USER=__PREENCHER__
+SMTP_PASS=__PREENCHER__
+FROM_EMAIL=__PREENCHER__
+FROM_NAME=__PREENCHER__
 N8N_API_KEY=__PREENCHER__
 N8N_DEFAULT_WORKFLOW_ID=__PREENCHER__
 N8N_EXECUTION_LIMIT=40000
